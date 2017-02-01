@@ -42,12 +42,17 @@ func main() {
 	} else {
 		ImgDir = "/Users/caoyongzheng/Pictures/image-server"
 	}
-	log.Println(ImgDir)
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		header := w.Header()
+		header.Set("Access-Control-Allow-Origin", "*")
+		header.Set("Access-Control-Max-Age", "2592000")
 		if r.Method == http.MethodGet {
 			getImage(w, r)
 		} else if r.Method == http.MethodPost {
 			addImage(w, r)
+		} else if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 		}
@@ -56,6 +61,7 @@ func main() {
 }
 
 func addImage(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.Header.Get("Content-Type"))
 	// parse file
 	img, imgH, err := r.FormFile("image")
 	if err != nil {
